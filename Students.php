@@ -10,6 +10,7 @@ include 'StudentManager.php';
 $studentManager = new StudentManager();
 
 $students = $studentManager->getAllStudent();
+
 ?>
 
 <!DOCTYPE html>
@@ -26,7 +27,7 @@ $students = $studentManager->getAllStudent();
     <div class="container mt-5">
         <h2>Wellcome, <?php echo $_SESSION['username']; ?>!</h2>
         <p>This is the main page after successful login.</p>
-        <a href="Logout.php" class="btn btn-danger">Logout</a>
+        <a href="dashboard.php" class="btn btn-primary">Trở lại</a>
 
         <h3>Student List</h3>
         <table class="table">

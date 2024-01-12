@@ -7,7 +7,7 @@ class StudentManager
         $servername = "localhost:3306";
         $username = "root";
         $password = "";
-        $dbname = "fptaptachdb";
+        $dbname = "fptaptechdb";
 
         $this->conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -17,27 +17,18 @@ class StudentManager
     }
     public function getAllStudent()
     {
-        $students = [];
+
         $sql = "SELECT * FROM students";
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute();
+        $stmp = $this->conn->query($sql);
+        $result = $stmp->fetch_all(MYSQLI_ASSOC);
 
-        $result = $stmt->get_result();
-
-        while ($row = $result->fetch_assoc()) {
-            $student[] = $row;
-        }
-
-        $stmt->close();
-
-        return $students;
+        return $result;
     }
 
     public function addstudent($id, $name, $address)
     {
         $sql = "INSERT INTO students (id, name, address) VALUES ('$id', '$name', '$address')";
         $stmt = $this->conn->prepare($sql);
-        $stmt->bind_param("iss", $id, $name, $address);
         $stmt->execute();
         $stmt->close();
     }
@@ -45,7 +36,7 @@ class StudentManager
     public function getStudentById($id)
     {
         $sql = "SELECT * FROM students WHERE id = ?";
-        $stmt->$this->conn->prepare($sql);
+        $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("i", $id);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -67,21 +58,27 @@ class StudentManager
 
     public function deleteStudent($id)
     {
-        $sql = "DELETE FROM students WHERE id=?";
-        $stmt->$this->conn->prepare($sql);
-        $stmt->bind_param("i", $id);
-        $stmt->execute();
-        $stmt->close();
+        $deleteMarksql = "DELETE FROM marks WHERE student_id = ?";
+        $result = $this->conn->prepare($deleteMarksql);
+        $result->bind_param("i", $id);
+        $result->execute();
+        if ($result->affected_rows >= 0) {
+            $sql = "DELETE FROM students WHERE id=?";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bind_param("i", $id);
+            $stmt->execute();
+            $stmt->close();
+        }
     }
 
-    public function getMarkDetails()
+    public function getMarkDetails($student_id)
     {
         $markDetails = [];
-        $sql = "SELECT students.id as student_id, students.name as student_name, students.address as student_address
-                FROM students
-                INNER JOIN marks ON students.id = mark.student_id
-                INNER JOIN subjects ON marks.subject_id = subjects.id";
-        $stmt->$this->conn->prepare($sql);
+        $sql = "SELECT students.id as student_id, students.name as student_name, students.address as student_address, subjects.name as 'subject', marks.mark as 'mark'         FROM students
+                INNER JOIN marks ON students.id = marks.student_id
+                INNER JOIN subjects ON marks.subject_id = subjects.id
+                WHERE students.id = '$student_id'";
+        $stmt = $this->conn->prepare($sql);
         $stmt->execute();
 
         $result = $stmt->get_result();
@@ -100,10 +97,10 @@ class StudentManager
     {
         $students = [];
 
-        $sql = "SELECT students.id , students.name, students.address COUNT (marks, students)
+        $sql = "SELECT students.id , students.name, students.address, marks.mark as 'mark_count'
                 FROM students
                 LEFT JOIN marks ON students.id = marks.student_id
-                GROUP BY students.id, student.name, students.address";
+                GROUP BY students.id, students.name, students.address";
 
         $result = $this->conn->query($sql);
         if ($result->num_rows > 0) {

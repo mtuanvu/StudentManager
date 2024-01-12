@@ -7,9 +7,10 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 include "StudentManager.php";
+$student_id = $_GET['student_id'];
 
 $studentManager = new StudentManager();
-$markDetails = $studentManager->getMarkDetails();
+$markDetails = $studentManager->getMarkDetails($student_id);
 
 ?>
 <!DOCTYPE html>

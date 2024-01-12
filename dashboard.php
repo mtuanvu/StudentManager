@@ -8,7 +8,7 @@ if (!isset($_SESSION['user_id'])) {
 
 include "./StudentManager.php";
 
-$students = new StudentManager();
+$studentManager = new StudentManager();
 
 
 $students = $studentManager->getAllStudentsWithMarks();

@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $studentManager = new StudentManager();
 
     $username = $_POST['username'];
-    $password = $_POST['passwprd'];
+    $password = $_POST['password'];
 
     $sql = "SELECT * FROM account WHERE username = ? AND password = ?";
     $stmt = $studentManager->conn->prepare($sql);
